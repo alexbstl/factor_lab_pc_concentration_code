@@ -276,17 +276,42 @@ def _run_nested(
         if progress else range(design_spec.n_reps)
     )
     n0 = n_values[0]
-    for r in rep_iter:
-        rep_rng = np.random.default_rng(int(rep_seeds[r]))
-        # (1) one superset model for this replicate — shared across all n and p.
-        model_full = build_model(model_spec, p_max, rep_rng)
-        logger.debug("rep={}: built superset model at p_max={}", r, p_max)
-        # (2) per-p analyses once per replicate — model-only, RNG-free, reused
-        #     across all n (population directions do not depend on n).
-        analyses_by_p = {
-            p: experiment.cell_setup(_slice_model_to_p(model_full, p), n0, p)
+
+    # With shared_loadings the single B — and therefore the per-p population
+    # bases derived from it — are drawn once for the entire experiment rather
+    # than once per replicate, from a generator seeded off the design (NOT off
+    # rep_seeds, so the loading draw does not move when n_reps changes).
+    shared = getattr(design_spec, "shared_loadings", False)
+    shared_model = shared_analyses = None
+    if shared:
+        shared_model = build_model(
+            model_spec, p_max, np.random.default_rng(design_spec.random_seed))
+        shared_analyses = {
+            p: experiment.cell_setup(_slice_model_to_p(shared_model, p), n0, p)
             for p in p_values
         }
+        logger.debug("shared_loadings: one superset model at p_max={}", p_max)
+
+    for r in rep_iter:
+        rep_rng = np.random.default_rng(int(rep_seeds[r]))
+        if shared:
+            # Burn the draws this replicate's own B would have consumed, so the
+            # factor/idio stream below is bit-identical to the per-replicate
+            # design. Flipping shared_loadings then changes the loading geometry
+            # and nothing else, which is what makes the two designs comparable
+            # replicate by replicate.
+            build_model(model_spec, p_max, rep_rng)
+            model_full, analyses_by_p = shared_model, shared_analyses
+        else:
+            # (1) one superset model for this replicate — shared across all n and p.
+            model_full = build_model(model_spec, p_max, rep_rng)
+            logger.debug("rep={}: built superset model at p_max={}", r, p_max)
+            # (2) per-p analyses once per replicate — model-only, RNG-free, reused
+            #     across all n (population directions do not depend on n).
+            analyses_by_p = {
+                p: experiment.cell_setup(_slice_model_to_p(model_full, p), n0, p)
+                for p in p_values
+            }
 
         if nest_time:
             # (3) one returns superset at (n_max, p_max) for this replicate; every

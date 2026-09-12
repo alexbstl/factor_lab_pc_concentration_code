@@ -187,6 +187,16 @@ class DesignSpec:
     # a clean monotone-in-n curve, the time analogue of the p nesting. With False
     # (the default) returns are redrawn independently for each n.
     nest_time: bool = False
+    # Share ONE loading matrix across every replicate (requires sampling ==
+    # "nested"). With False (the default) each replicate draws its own superset B
+    # at p_max, so the sweep averages over universes — each path is scored against
+    # its own truth. With True a single B is drawn once for the whole experiment
+    # and every replicate is scored against that same truth, with p walking its
+    # prefixes: the design described in the paper text ("this loading matrix B is
+    # fixed for all 1000 paths"). The factor/idio draws are identical either way
+    # (see _run_nested), so flipping this changes the loading geometry and nothing
+    # else — the B-free theory quantities (floor, rhs, rotation) are unmoved.
+    shared_loadings: bool = False
 
     def __post_init__(self) -> None:
         # nest_time piggybacks on the nested sampler's per-replicate superset draw,
@@ -195,6 +205,14 @@ class DesignSpec:
             raise ValueError(
                 "nest_time=True requires sampling='nested' (it nests the n axis "
                 f"on top of the p nesting); got sampling={self.sampling!r}."
+            )
+        # shared_loadings hoists the nested sampler's per-replicate B draw out of
+        # the replicate loop; there is no such draw to hoist anywhere else.
+        if self.shared_loadings and self.sampling != "nested":
+            raise ValueError(
+                "shared_loadings=True requires sampling='nested' (it shares the "
+                "per-replicate superset loading draw across replicates); got "
+                f"sampling={self.sampling!r}."
             )
 
     @classmethod
