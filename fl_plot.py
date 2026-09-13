@@ -43,7 +43,7 @@ whatever value columns the marks reference; one row per (replicate, factor).
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace as _dc_replace
 from pathlib import Path
 
 import numpy as np
@@ -666,7 +666,7 @@ class Row:
 def grid(df: pd.DataFrame, key: str, rows, *, suptitle=None, caption_extra=None,
          caption: bool = True, out_path=None, formats=("png",), dpi=150,
          sharey="row", factors=None, col_titles=None, figsize=None,
-         legend_row: int | None = 0, theme: Theme = THEME):
+         legend_row: int | None = 0, theme: Theme = THEME, xlabel: str | None = None):
     """Compose ``rows`` of marks × factor columns into a finished figure.
 
     - columns are the factors (``df["j"]`` values, sorted) with navy titles;
@@ -681,11 +681,15 @@ def grid(df: pd.DataFrame, key: str, rows, *, suptitle=None, caption_extra=None,
     - the bottom caption is assembled from each mark's fragment + R;
     - ``legend_row``: row whose marks contribute the legend on its first
       panel (None disables);
+    - ``xlabel`` overrides the swept axis's default label ("p (assets)" /
+      "n (periods)") for this figure only; None keeps the default;
     - saves ``out_path`` with each extension in ``formats`` when given.
 
     Returns ``(fig, axes)``.
     """
     ax_spec = sweep_axis(df, key)
+    if xlabel is not None:
+        ax_spec = _dc_replace(ax_spec, xlabel=xlabel)
     factors = factors or sorted(df["j"].unique())
     rows = list(rows)
     nrows, ncols = len(rows), len(factors)
