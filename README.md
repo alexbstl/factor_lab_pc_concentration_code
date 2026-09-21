@@ -9,6 +9,7 @@ fl_plot.py        figure grammar
 notebooks/        ex-2_combined, ex-2_heavy_tail_v2, ex-3_pathwise_formula31,
                   ex-6_rotation_figures
 nb_outputs/       sweep caches and figures — gitignored
+hedging/          subspace-vs-pairwise factor hedging (branch work; see hedging/README.md)
 ```
 
 Run notebooks from `notebooks/`; they put the repo root and `sim/` on `sys.path`, so
