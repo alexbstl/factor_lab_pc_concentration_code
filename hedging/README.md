@@ -11,6 +11,7 @@ term, leaving only the estimable out-of-subspace error?
 ```
 hedge_lab.py                              analyses + Experiment for the existing engine
 ex-h1_subspace_vs_pairwise_hedging.ipynb  the figures and the argument
+ex-h2_two_factor_radar.ipynb              the same claim drawn, on one k=2 disk
 ```
 
 Nothing under `sim/` is modified. `hedge_lab.py` plugs into the same
@@ -40,6 +41,22 @@ Frobenius norm is invariant; the diagonal is not. Everything else follows.
 | Estimable ceiling | $\sqrt{\sum_j \hat\ell/\hat\theta_j}$ tracks the true out-of-subspace ceiling to within 4–8% over $n\in[20,250]$ |
 | The floor is set by $n$ | Growing $p$ from 100 to 20,000 leaves it flat; growing $n$ shrinks it |
 | The blind spot | The worst-case book satisfies $\Pi_H w = 0$ — the estimate sees it as factor-neutral, so the hedge is the identity on it and removes exactly 0% of its factor variance |
+
+## The k=2 picture (`ex-h2`)
+
+At $k=2$ the true factor subspace is a single *plane*, so one disk holds the whole
+estimate: each $h_j$ is plotted at $(\langle\bar b_1,h_j\rangle,\langle\bar b_2,h_j\rangle)$,
+the radial shortfall from the unit circle **is** the out-of-subspace error, and the
+angular position is the in-plane rotation. Rotating the estimated frame spins the
+arrows — radii, axis angles and even the angle between the arrows all move — while
+$\sum_j\lVert\Pi_\mathcal{B}h_j\rVert^2=\lVert C\rVert_F^2$ does not.
+
+The payoff figure: for one book, the $m=1$ residual rides a closed locus as $Q$ turns
+through 360°, running from 0.066 (about what the block hedge achieves) all the way up
+to 0.899 — the *unhedged* exposure, i.e. a rotation at which the single-factor hedge
+removes nothing. The $m=2$ residual is one point, 0.0658, for every $Q$ (spread 3e-16).
+A standalone notebook: it borrows the picture from `notebooks/ex-10_two_factor_paired_radar_sharedB`
+but none of its machinery.
 
 ## Running it
 
