@@ -11,8 +11,13 @@ term, leaving only the estimable out-of-subspace error?
 ```
 hedge_lab.py                              analyses + Experiment for the existing engine
 ex-h1_subspace_vs_pairwise_hedging.ipynb  the figures and the argument
-ex-h2_two_factor_radar.ipynb              the same claim drawn, on one k=2 disk
+ex-h2_two_factor_radar.ipynb              the k=2 dial
+ex-h3_paired_dial_colours.ipynb           linking the two dials by colour
 ```
+
+**ex-h2 and ex-h3 are a separate line of work from ex-h1** — the k=2 geometry in
+its own right, not a demonstration of the hedging claim. Treat them as unrelated
+for now.
 
 Nothing under `sim/` is modified. `hedge_lab.py` plugs into the same
 `ModelSpec` / `DesignSpec` / `Experiment` seams as `sim_theorem_partii.py`, and
@@ -57,6 +62,33 @@ to 0.899 — the *unhedged* exposure, i.e. a rotation at which the single-factor
 removes nothing. The $m=2$ residual is one point, 0.0658, for every $Q$ (spread 3e-16).
 A standalone notebook: it borrows the picture from `notebooks/ex-10_two_factor_paired_radar_sharedB`
 but none of its machinery.
+
+## ex-h3 — linking the two dials by colour
+
+Explores a proposal from N.: keep the factor-1 points $\{p_i\}$ and factor-2 points
+$\{q_i\}$ in their own positions but link them **by colour rather than geometry**,
+keying the colour to each $p_i$'s own angle through a cyclic map and giving $q_i$ its
+partner's colour. If the $\approx90\degree$ relation is clean, the $q$ pattern is the
+$p$ pattern rotated a quarter turn; where it breaks, colours bleed into the wrong
+sector. It avoids drawing 1000 illegible pairing lines.
+
+**Finding: the quarter turn is clean, and there is an exact reason.** Median hue
+mismatch after rotating $q$ by $-90\degree$ onto $p$ is 0.25° at $p=100$ and 0.05° at
+$p=50{,}000$, with no sector of systematic breakdown. Writing
+$\delta=\theta_q-\theta_p-90\degree$, its spread collapses 161× (8.30° → 0.05°)
+across the $p$ grid while **both marginal cloud spreads barely move** (~4.4°) — the
+frame wanders as a rigid body, and only its internal geometry converges.
+
+The mechanism is an identity, not a fit. $h_1\perp h_2$ in $\mathbb{R}^p$, so splitting
+each into in-plane and out-of-plane parts,
+
+$$0=\langle h_1,h_2\rangle=\langle\Pi h_1,\Pi h_2\rangle+\langle\Pi^{\perp}h_1,\Pi^{\perp}h_2\rangle
+\;\Longrightarrow\;\langle\Pi h_1,\Pi h_2\rangle=-\langle\Pi^{\perp}h_1,\Pi^{\perp}h_2\rangle,$$
+
+verified to 1.9e-16, with $\delta=\arcsin(\text{cross term})$ exactly. The
+out-of-subspace *masses* hardly change in $p$; their two components **decorrelate**,
+which is what drives the cross term — and hence the departure from a right angle — to
+zero.
 
 ## Running it
 
