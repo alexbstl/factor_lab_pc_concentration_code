@@ -107,9 +107,12 @@ def sample_pcs(Y: np.ndarray, k: int, center: bool = True):
 
     dual = eigenvalues[order] / (n * p)
     theta = dual[:k]
-    # Drop the last dual eigenvalue when centered: row-demeaning Y costs one
-    # degree of freedom, leaving an exact zero that would drag the bulk mean down.
-    bulk = dual[k:n - 1] if center else dual[k:]
+    # Average only over the nonzero spectrum: rank(Y) <= min(p, n - 1) when
+    # centered (row-demeaning costs a time degree of freedom), min(p, n) if not.
+    # When p < n the dual Gram carries n - p exact zeros that would otherwise
+    # drag the bulk mean down; for p >= n this is the old dual[k:n-1].
+    rank = min(p, n - 1 if center else n)
+    bulk = dual[k:rank]
     return H, theta, float(bulk.mean())
 
 

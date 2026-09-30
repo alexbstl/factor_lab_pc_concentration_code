@@ -13,6 +13,7 @@ hedge_lab.py                              analyses + Experiment for the existing
 ex-h1_subspace_vs_pairwise_hedging.ipynb  the figures and the argument
 ex-h2_two_factor_radar.ipynb              the k=2 dial
 ex-h3_paired_dial_colours.ipynb           linking the two dials by colour
+ex-h4_memo_running_example.ipynb          the hedges on the memo's p=10, k=2 example
 ```
 
 **ex-h2 and ex-h3 are a separate line of work from ex-h1** — the k=2 geometry in
